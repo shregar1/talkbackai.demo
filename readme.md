@@ -4,3 +4,4 @@ Commands to boot up the server
 1. Make sure to add OPENAI_API_KEY to .env
 2. docker compose build
 3. docker compose up
+https://drive.google.com/file/d/1Msdoz59ob6hs62Nt0qXZzogtnAnCrsDg/view?usp=sharing
