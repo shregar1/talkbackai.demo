@@ -1,0 +1,5 @@
+{
+    "backend_url": "redis://:{password}@{host}:{port}/{db}",
+    "broker_url": "redis://:{password}@{host}:{port}/{db}",
+    "db": 0
+}

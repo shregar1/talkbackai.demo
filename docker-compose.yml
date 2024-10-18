@@ -1,0 +1,67 @@
+# docker-compose.yml
+version: '3.8'
+
+networks:
+  talkback_ai_net:
+    driver: bridge
+
+services:
+
+  redis:
+    image: "redis:7.2-alpine"
+    command: redis-server --requirepass "test123"
+    expose:
+     - "6379"
+    ports:
+      - 6379:6379
+    networks:
+      - talkback_ai_net
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A start_utils.celery worker --loglevel=info
+    networks:
+      - talkback_ai_net
+    depends_on:
+      - redis
+
+  scylla:
+    image: scylladb/scylla:5.1
+    ports:
+      - "9042:9042"
+    volumes:
+      - scylla_data:/var/lib/scylla
+    networks:
+      - talkback_ai_net
+    command: --smp 1 --memory 750M --overprovisioned 1 --api-address 0.0.0.0
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - talkback_ai_net
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8005:8005"
+    networks:
+      - talkback_ai_net
+    volumes:
+      - .:/app
+    depends_on:
+      - redis 
+      - celery
+      - scylla
+      - ollama
+
+volumes:
+  scylla_data:
+  ollama_data:
